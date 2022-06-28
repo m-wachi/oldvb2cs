@@ -16,6 +16,7 @@
     <FsLex Include="Lexer.fsl">
       <OtherFlags>--module Lexer --unicode</OtherFlags>
     </FsLex>
+    <Compile Include="Ast.fs" />
     <Compile Include="Parser.fsi" />
     <Compile Include="Parser.fs" />
     <Compile Include="Lexer.fs" />

@@ -1,5 +1,5 @@
 %{
-
+open Ast
 
 %}
 
@@ -14,7 +14,7 @@
 
 // This is the type of the data produced by a successful reduction of the 'start'
 // symbol:
-%type < int > start
+%type < Ast.Prog > start
 
 %%
 
@@ -24,9 +24,9 @@ start: File end { $1 }
      | end      { $1 }
 
 File:
-	| HELLO						{ 1 }
-	| HELLO HELLO				{ 2 }
+	| HELLO						{ Prog [Ast.Str "hello"] }
+	| HELLO HELLO				{ Prog [Ast.Str "hello"] }
 
 
 // Using F# keywords for nonterminal names is okay.
-end: EOF { 3 }
+end: EOF { Prog [] }
