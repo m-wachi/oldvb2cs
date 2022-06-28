@@ -8,6 +8,7 @@ open Ast
 
 // Regular tokens
 %token HELLO
+%token <System.Int32> INT
 
 // Misc tokens
 %token EOF
@@ -25,8 +26,8 @@ start: File end { $1 }
 
 File:
 	| HELLO						{ Prog [Ast.Str "hello"] }
-	| HELLO HELLO				{ Prog [Ast.Str "hello"] }
-
+	| HELLO HELLO				{ Prog [(Ast.Str "hello"); (Ast.Str "hello")] }
+    | INT                       { Prog [(Ast.Int $1)] }
 
 // Using F# keywords for nonterminal names is okay.
 end: EOF { Prog [] }
