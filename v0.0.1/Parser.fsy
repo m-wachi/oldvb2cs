@@ -4,7 +4,7 @@ open Ast
 %}
 
 // The start token becomes a parser function in the compiled code:
-%start start
+%start prog
 
 // Regular tokens
 %token HELLO
@@ -15,19 +15,19 @@ open Ast
 
 // This is the type of the data produced by a successful reduction of the 'start'
 // symbol:
-%type < Ast.Prog > start
+%type < Ast.Prog > prog
 
 %%
 
 // These are the rules of the grammar along with the F# code of the 
 // actions executed as rules are reduced.  
-start: File end { $1 }
-     | end      { $1 }
+prog: File end { $1 }
+      | end      { $1 }
 
 File:
-	| HELLO						{ Prog [Ast.Str "hello"] }
-	| HELLO HELLO				{ Prog [(Ast.Str "hello"); (Ast.Str "hello")] }
-    | INT                       { Prog [(Ast.Int $1)] }
+	| HELLO						{ Prog [Ast.StringExp "hello"] }
+	| HELLO HELLO				{ Prog [(Ast.StringExp "hello"); (Ast.StringExp "hello")] }
+    | INT                       { Prog [(Ast.IntExp $1)] }
 
 // Using F# keywords for nonterminal names is okay.
 end: EOF { Prog [] }
