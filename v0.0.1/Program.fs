@@ -3,6 +3,7 @@
 open System.IO
 open FSharp.Text.Lexing
 
+
 let parseFile (fileName: string) =
     use textReader = new System.IO.StreamReader(fileName)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
@@ -10,10 +11,13 @@ let parseFile (fileName: string) =
     Parser.start Lexer.tokenstream lexbuf
     
 
-let testFile = Path.Combine(__SOURCE_DIRECTORY__, "test.txt")
-let prsRes = parseFile testFile
+[<EntryPoint>]
+let main argv =
 
-printfn "%s" (Ast.progToStr prsRes)
+    let testFile = Path.Combine(__SOURCE_DIRECTORY__, argv.[0])
+    let prsRes = parseFile testFile
 
+    printfn "%s" (Ast.progToStr prsRes)
 
+    0 // return an integer exit code
 
