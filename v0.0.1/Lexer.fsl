@@ -20,6 +20,7 @@ rule tokenstream = parse
 // --------------------------
 | "hello" 		{ Parser.HELLO }
 | ['-']?digit+   { Parser.INT (Int32.Parse(lexeme lexbuf))}
+| ['a'-'z']+    { Parser.ID (lexeme lexbuf) } 
 // --------------------------
 | whitespace	{ tokenstream lexbuf }
 | newline	{ newline lexbuf; tokenstream lexbuf }

@@ -9,6 +9,7 @@ open Ast
 // Regular tokens
 %token HELLO
 %token <System.Int32> INT
+%token <string> ID
 
 // Misc tokens
 %token EOF
@@ -28,6 +29,7 @@ File:
 	| HELLO						{ Prog [Ast.StringExp "hello"] }
 	| HELLO HELLO				{ Prog [(Ast.StringExp "hello"); (Ast.StringExp "hello")] }
     | INT                       { Prog [(Ast.IntExp $1)] }
-
+    | ID INT                    { Prog [(Ast.VarExp (Ast.SimpleVar ($1, 0))); (Ast.IntExp $2)] }
+    
 // Using F# keywords for nonterminal names is okay.
 end: EOF { Prog [] }

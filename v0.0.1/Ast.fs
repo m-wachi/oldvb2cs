@@ -7,19 +7,20 @@ module Ast
 
     type Var = SimpleVar of Symbol * pos
 
-    type Expr = 
+    type Exp = 
         | VarExp of Var 
         | IntExp of int
         | StringExp of string
 
-    type Prog = Prog of Expr list
+    type Prog = Prog of Exp list
 
 
     let exprToStr expr =
         match expr with
-        | IntExp n -> "Int " + n.ToString()
-        | StringExp s -> "Str " + s
-
+        | IntExp n -> "IntExp: " + n.ToString()
+        | StringExp s -> "StringExp: " + s
+        | VarExp (SimpleVar (sym, pos)) -> "VarExp: SimpleVar: " + sym.ToString()
+        
     let progToStr (Prog exprs) = 
         let sExprs = List.map exprToStr exprs
     
