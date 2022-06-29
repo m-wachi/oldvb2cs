@@ -8,7 +8,7 @@ let parseFile (fileName: string) =
     use textReader = new System.IO.StreamReader(fileName)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
 
-    Parser.start Lexer.tokenstream lexbuf
+    Parser.prog Lexer.tokenstream lexbuf
     
 
 [<EntryPoint>]
