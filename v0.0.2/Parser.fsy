@@ -11,6 +11,7 @@
 %token <string> ID
 %token EQUAL LPAREN RPAREN
 %token LINE_TERM
+%token <string> COMMENT
 
 // Misc tokens
 %token EOF
