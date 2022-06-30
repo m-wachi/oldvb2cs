@@ -10,6 +10,7 @@
 %token <System.Int32> INT
 %token <string> ID
 %token EQUAL LPAREN RPAREN
+%token LINE_TERM
 
 // Misc tokens
 %token EOF
@@ -17,12 +18,14 @@
 // This is the type of the data produced by a successful reduction of the 'start'
 // symbol:
 %type < Ast.Prog > prog
+%type < (Ast.Statement * Ast.Comment) > logical_line
+%type < Ast.Statement > statement
 
 %%
 
 // These are the rules of the grammar along with the F# code of the 
 // actions executed as rules are reduced.  
-prog: statement end { Ast.Prog [ $1 ] }
+prog: logical_line end { Ast.Prog [ $1 ] }
       | end      { Ast.Prog [] }
 
 //File:
@@ -31,6 +34,10 @@ prog: statement end { Ast.Prog [ $1 ] }
 //    | INT                       { Prog [(Ast.IntExp $1)] }
 //    | ID INT                    { Prog [(Ast.VarExp (Ast.SimpleVar ($1, 0))); (Ast.IntExp $2)] }
     
+
+logical_line: 
+    statement LINE_TERM        { ($1, "") }
+
 
 statement:
     ID EQUAL exp               { Ast.AssignStmt (Ast.SimpleVar($1, 0), $3) }

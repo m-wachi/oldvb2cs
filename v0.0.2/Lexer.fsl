@@ -24,7 +24,7 @@ rule tokenstream = parse
 | "="           { Parser.EQUAL }
 // --------------------------
 | whitespace	{ tokenstream lexbuf }
-| newline	{ newline lexbuf; tokenstream lexbuf }
+| newline	{ Parser.LINE_TERM }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }

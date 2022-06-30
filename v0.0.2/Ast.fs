@@ -4,6 +4,8 @@ module Ast
 
     type pos = int
     type Symbol = string
+   
+    type Comment = string
 
     type Var = SimpleVar of Symbol * pos
 
@@ -15,7 +17,9 @@ module Ast
     type Statement = 
         | AssignStmt of Var * Exp
 
-    type Prog = Prog of Statement list
+    type LogicalLine = (Statement * Comment)
+
+    type Prog = Prog of LogicalLine list
 
 
     let varToStr v =
@@ -33,10 +37,12 @@ module Ast
         match stmt with
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"
     
+    let logicalLineToStr (stmt, cmnt) =
+        "LogicalLine: (" + (statementToStr stmt) + ", " + cmnt + ")"
         
-    let progToStr (Prog stmts) = 
-        let sStmts = List.map statementToStr stmts
+    let progToStr (Prog lgcllns) = 
+        let sLgcllns = List.map logicalLineToStr lgcllns
     
-        "Prog " + String.Join(", ", sStmts)
+        "Prog " + String.Join(", ", sLgcllns)
     
     
