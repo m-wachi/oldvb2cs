@@ -16,18 +16,18 @@ let whitespace = [' ' '\t' ]
 let newline = ('\n' | '\r' '\n')
 let digit = ['0'-'9']
 
-rule tokenstream = 
+rule sts_initial = 
   parse ['-']?digit+   { Parser.INT (Int32.Parse(lexeme lexbuf))}
       | ['a'-'z']+    { Parser.ID (lexeme lexbuf) } 
       | "="           { Parser.EQUAL }
       | "'"             { sts_comment lexbuf }
-      | whitespace	{ tokenstream lexbuf }
+      | whitespace	{ sts_initial lexbuf }
       | newline	{ Parser.LINE_TERM }
       | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
       | eof   	{ Parser.EOF }
 and sts_comment =
-  parse newline     { tokenstream lexbuf }
-      | _*  { Parser.COMMENT ("cmnt") }
+  parse newline     { sts_initial lexbuf }
+      | [^'\n' '\r']*  { Parser.COMMENT (lexeme lexbuf) }
 {
 
 }

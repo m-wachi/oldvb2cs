@@ -38,6 +38,7 @@ prog: logical_line end { Ast.Prog [ $1 ] }
 
 logical_line: 
     statement LINE_TERM        { ($1, "") }
+    | statement COMMENT LINE_TERM        { ($1, $2) }
 
 
 statement:
