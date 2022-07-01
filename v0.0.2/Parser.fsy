@@ -12,6 +12,7 @@
 %token EQUAL LPAREN RPAREN
 %token LINE_TERM
 %token <string> COMMENT
+%token <string> STRING
 
 // Misc tokens
 %token EOF
@@ -46,7 +47,7 @@ statement:
 
 exp: 
     INT                        { Ast.IntExp $1 }
-
+    | STRING                   { Ast.StringExp $1 }
 
 // Using F# keywords for nonterminal names is okay.
 end: EOF {}

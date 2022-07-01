@@ -21,13 +21,17 @@ rule sts_initial =
       | ['a'-'z']+    { Parser.ID (lexeme lexbuf) } 
       | "="           { Parser.EQUAL }
       | "'"             { sts_comment lexbuf }
+      | "\""             { sts_string lexbuf }
       | whitespace	{ sts_initial lexbuf }
       | newline	{ Parser.LINE_TERM }
       | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
       | eof   	{ Parser.EOF }
 and sts_comment =
-  parse newline     { sts_initial lexbuf }
+  parse newline        { sts_initial lexbuf }
       | [^'\n' '\r']*  { Parser.COMMENT (lexeme lexbuf) }
+and sts_string =
+  parse "\""           { sts_initial lexbuf }
+      | [^'\n' '\r']*  { Parser.STRING (lexeme lexbuf) }
 {
 
 }
