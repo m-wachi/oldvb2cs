@@ -6,11 +6,12 @@
 %start prog
 
 // Regular tokens
-%token HELLO
 %token <System.Int32> INT
 %token <string> ID
-%token EQUAL LPAREN RPAREN
+%token EQUAL LPAREN RPAREN COMMA
+%token SUB END AS
 %token LINE_TERM
+%token TY_STRING TY_INT
 %token <string> COMMENT
 %token <string> STRING
 
@@ -36,12 +37,6 @@ logical_lines:
     logical_line                       { [ $1] }
     | logical_line logical_lines       { $1 :: $2 }
 
-//File:
-//	| HELLO						{ Prog [Ast.StringExp "hello"] }
-//	| HELLO HELLO				{ Prog [(Ast.StringExp "hello"); (Ast.StringExp "hello")] }
-//    | INT                       { Prog [(Ast.IntExp $1)] }
-//    | ID INT                    { Prog [(Ast.VarExp (Ast.SimpleVar ($1, 0))); (Ast.IntExp $2)] }
-    
 
 logical_line: 
     statement LINE_TERM                  { ($1, "") }
@@ -50,23 +45,36 @@ logical_line:
     | LINE_TERM                          { (Ast.BlankLine, "") }
     | subroutine_declaration LINE_TERM   { ($1, "") }
 
-subroutine_declaration:
-    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
-        { (Ast.ProcDec {name=(Symbol.symbol ID), params=(procedure_parameters), body=logical_lines, pos=0}) }
+//subroutine_declaration:
+//    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
+//        { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
 
-procedure_parameters: 
-    procedure_parameter   ([procedure_parameter])
-    | procedure_parameter COMMA procedure_parameters  (procedure_parameter :: procedure_parameters)
-    | ([])
+subroutine_declaration:
+    SUB ID LINE_TERM logical_lines END SUB
+        { Ast.ProcDec (name=$2, prmtrs=[], body=$4, pos=0) }
+
+
+//procedure_parameters: 
+//    procedure_parameter   { [$1] }
+//    | procedure_parameter COMMA procedure_parameters { $1 :: $3 }
+//    | {[]}
 	
-procedure_parameter: 
-    ID AS vbprimtype ({name=(Symbol.symbol ID), escape=ref false, vbty=(Absyn.VbTySimple (vbprimtype)), pos=0})
-    | ID LPAREN RPAREN AS vbprimtype 
-        ({name=(Symbol.symbol ID), escape=ref false, vbty=(Absyn.VbTyArray (vbprimtype)), pos=0})
+//procedure_parameter: 
+//    ID AS vbprimtype { {Name=$1; Vbty=(Ast.VbTySimple $3); Pos=0} }
+//    | ID LPAREN RPAREN AS vbprimtype 
+//       { {Name=$1; Vbty=(Ast.VbTyArray $5); Pos=0} }
 
 
 statement:
     ID EQUAL exp               { Ast.AssignStmt (Ast.SimpleVar($1, 0), $3) }
+
+vbtype:
+    TY_STRING  { Ast.VbTySimple Ast.VbTyString }
+    | TY_INT   { Ast.VbTySimple Ast.VbTyInt }
+
+vbprimtype:
+    TY_STRING { Ast.VbTyString }
+    | TY_INT  { Ast.VbTyInt }
 
 exp: 
     INT                        { Ast.IntExp $1 }

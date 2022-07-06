@@ -13,7 +13,7 @@ module Ast
 
     type VbType = VbTySimple of VbPrimType  | VbTyArray of VbPrimType
 
-    type Field = {Name: Symbol, Vbty: VbType, Pos: pos}
+    type Field = {Name: Symbol; Vbty: VbType; Pos: pos}
 
     type Exp = 
         | VarExp of Var 
@@ -23,12 +23,9 @@ module Ast
     type Statement = 
         | AssignStmt of Var * Exp
         | BlankLine
-        | ProcDec of {
-            Name: Symbol, Params: Field list,
-            Body: lgline list,
-            Pos: pos}
-
-    type LgLine = (Statement * Comment)
+        | ProcDec of 
+            name: Symbol * prmtrs: Field list * body: LgLine list * pos: pos
+    and LgLine = (Statement * Comment)
 
     type LogicalLine = (Statement * Comment)
 
@@ -43,16 +40,37 @@ module Ast
     let exprToStr expr =
         match expr with
         | IntExp n -> "IntExp: " + n.ToString()
-        | StringExp s -> "StringExp: " + s
+        | StringExp s -> "StringExp: \"" + s + "\""
         | VarExp (SimpleVar (sym, pos)) -> "VarExp: SimpleVar: " + sym.ToString()
 
-    let statementToStr stmt =
+    let rec statementToStr stmt =
         match stmt with
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"
         | BlankLine -> "BlankLine"
-    
-    let logicalLineToStr (stmt, cmnt) =
+        | ProcDec (nm, pms, bdy, p) -> (procDecToStr nm pms bdy p)
+
+    and procDecToStr nm pms bdy p =
+        let procName = nm
+        //let sParam = MwUtil.strJoin (", ", (map fieldToStr (#params r)))
+        let sParam = ""
+        let procHdr = "ProcDec " + procName + "(" + sParam + ")\n" 
+        let body = logicalLinesToStr bdy
+        //let body = "(not implemented yet.)"
+        //procHdr ^ body ^ "End ProcDec " ^ procName
+        procHdr + body + "End ProcDec " + procName
+
+    and logicalLineToStr (stmt, cmnt) =
         "LogicalLine: (" + (statementToStr stmt) + ", " + cmnt + ")"
+
+    and logicalLinesToStr (lglines: LgLine list) =
+        //if List.isEmpty lglines then ""
+        //else
+        //    let lgl1::lgls = lglines
+        //    (logicalLineToStr lgl1) + (logicalLinesToStr lgls)
+
+        match lglines with
+        | [] -> ""    //empty case
+        | lgl1::lgls -> (logicalLineToStr lgl1) + (logicalLinesToStr lgls)
         
     let progToStr (Prog lgcllns) = 
         let sLgcllns = List.map logicalLineToStr lgcllns
