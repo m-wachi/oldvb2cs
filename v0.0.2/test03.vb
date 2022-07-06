@@ -1,7 +1,7 @@
 '
 ' main function
 '
-Sub Main
+Sub Main(argv() As String)
 
     ' assign statement
     ab0_1 = "Hello "

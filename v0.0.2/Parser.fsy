@@ -45,24 +45,19 @@ logical_line:
     | LINE_TERM                          { (Ast.BlankLine, "") }
     | subroutine_declaration LINE_TERM   { ($1, "") }
 
-//subroutine_declaration:
-//    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
-//        { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
-
 subroutine_declaration:
-    SUB ID LINE_TERM logical_lines END SUB
-        { Ast.ProcDec (name=$2, prmtrs=[], body=$4, pos=0) }
+    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
+        { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
 
-
-//procedure_parameters: 
-//    procedure_parameter   { [$1] }
-//    | procedure_parameter COMMA procedure_parameters { $1 :: $3 }
-//    | {[]}
+procedure_parameters: 
+    procedure_parameter   { [$1] }
+    | procedure_parameter COMMA procedure_parameters { $1 :: $3 }
+    | {[]}
 	
-//procedure_parameter: 
-//    ID AS vbprimtype { {Name=$1; Vbty=(Ast.VbTySimple $3); Pos=0} }
-//    | ID LPAREN RPAREN AS vbprimtype 
-//       { {Name=$1; Vbty=(Ast.VbTyArray $5); Pos=0} }
+procedure_parameter: 
+    ID AS vbprimtype { {Name=$1; Vbty=(Ast.VbTySimple $3); Pos=0} }
+    | ID LPAREN RPAREN AS vbprimtype 
+       { {Name=$1; Vbty=(Ast.VbTyArray $5); Pos=0} }
 
 
 statement:
