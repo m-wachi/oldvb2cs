@@ -30,6 +30,7 @@ and sts_comment =
   parse [^'\n' '\r']*  { Parser.COMMENT (lexeme lexbuf) }
 and sts_string s =
   parse [^ '"']  { sts_string (s + (lexeme lexbuf)) lexbuf }
+      | '"' '"'  { sts_string (s + "\"") lexbuf }
       | '"'      { Parser.STRING s }
       | "\n"  { failwith ("LexerError crlf before 2nd \" in string") }
 {
