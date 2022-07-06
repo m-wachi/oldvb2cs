@@ -9,6 +9,12 @@ module Ast
 
     type Var = SimpleVar of Symbol * pos
 
+    type VbPrimType = VbTyString | VbTyInt
+
+    type VbType = VbTySimple of VbPrimType  | VbTyArray of VbPrimType
+
+    type Field = {Name: Symbol, Vbty: VbType, Pos: pos}
+
     type Exp = 
         | VarExp of Var 
         | IntExp of int
@@ -17,6 +23,12 @@ module Ast
     type Statement = 
         | AssignStmt of Var * Exp
         | BlankLine
+        | ProcDec of {
+            Name: Symbol, Params: Field list,
+            Body: lgline list,
+            Pos: pos}
+
+    type LgLine = (Statement * Comment)
 
     type LogicalLine = (Statement * Comment)
 
