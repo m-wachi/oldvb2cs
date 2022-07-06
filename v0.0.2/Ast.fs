@@ -16,6 +16,7 @@ module Ast
 
     type Statement = 
         | AssignStmt of Var * Exp
+        | BlankLine
 
     type LogicalLine = (Statement * Comment)
 
@@ -36,6 +37,7 @@ module Ast
     let statementToStr stmt =
         match stmt with
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"
+        | BlankLine -> "BlankLine"
     
     let logicalLineToStr (stmt, cmnt) =
         "LogicalLine: (" + (statementToStr stmt) + ", " + cmnt + ")"

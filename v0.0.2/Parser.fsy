@@ -27,8 +27,14 @@
 
 // These are the rules of the grammar along with the F# code of the 
 // actions executed as rules are reduced.  
-prog: logical_line end { Ast.Prog [ $1 ] }
-      | end      { Ast.Prog [] }
+prog: 
+    logical_lines end { Ast.Prog $1 }
+    | end      { Ast.Prog [] }
+    
+
+logical_lines:
+    logical_line                       { [ $1] }
+    | logical_line logical_lines       { $1 :: $2 }
 
 //File:
 //	| HELLO						{ Prog [Ast.StringExp "hello"] }
@@ -40,6 +46,8 @@ prog: logical_line end { Ast.Prog [ $1 ] }
 logical_line: 
     statement LINE_TERM        { ($1, "") }
     | statement COMMENT LINE_TERM        { ($1, $2) }
+    | COMMENT LINE_TERM              { (Ast.BlankLine, $1) }
+    | LINE_TERM                      { (Ast.BlankLine, "") }
 
 
 statement:
