@@ -9,7 +9,7 @@
 %token <System.Int32> INT
 %token <string> ID
 %token EQUAL LPAREN RPAREN COMMA
-%token SUB END AS
+%token SUB END DIM AS
 %token LINE_TERM
 %token TY_STRING TY_INT
 %token <string> COMMENT
@@ -62,7 +62,12 @@ procedure_parameter:
 
 statement:
     ID EQUAL exp               { Ast.AssignStmt (Ast.SimpleVar($1, 0), $3) }
+    | local_var_decl           { $1 }
 
+local_var_decl:
+    DIM ID AS vbprimtype    { Ast.LclVarDecl (Ast.SimpleVar($2, 0), Ast.VbTySimple $4) }
+    | DIM ID LPAREN RPAREN AS vbprimtype { Ast.LclVarDecl (Ast.SimpleVar($2, 0), (Ast.VbTyArray $6)) }
+    
 vbtype:
     TY_STRING  { Ast.VbTySimple Ast.VbTyString }
     | TY_INT   { Ast.VbTySimple Ast.VbTyInt }
