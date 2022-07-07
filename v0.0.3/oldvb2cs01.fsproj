@@ -20,6 +20,7 @@
     <Compile Include="Parser.fsi" />
     <Compile Include="Parser.fs" />
     <Compile Include="Lexer.fs" />
+    <Compile Include="TransCs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
