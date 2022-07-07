@@ -1,0 +1,47 @@
+{
+
+// Opens methods related to fslex.exe
+open System
+open FSharp.Text.Lexing
+
+let lexeme = LexBuffer<_>.LexemeString
+
+let newline (lexbuf: LexBuffer<_>) = 
+  lexbuf.StartPos <- lexbuf.StartPos.NextLine
+
+}
+
+// Regular expressions
+let whitespace = [' ' '\t' ]
+let newline = ('\n' | '\r' '\n')
+let digit = ['0'-'9']
+
+rule sts_initial = 
+  parse ['-']?digit+   { Parser.INT (Int32.Parse(lexeme lexbuf))}
+      | "="            { Parser.EQUAL }
+      | "'"            { sts_comment lexbuf }
+      | ","            { Parser.COMMA }
+      | '('            { Parser.LPAREN }
+      | ')'            { Parser.RPAREN }
+      | "\""           { sts_string "" lexbuf }
+      | "Sub"          { Parser.SUB }
+      | "End"          { Parser.END }
+      | "Dim"          { Parser.DIM }
+      | "As"           { Parser.AS }
+      | "String"           { Parser.TY_STRING }
+      | "Integer"           { Parser.TY_INT }
+      | whitespace	  { sts_initial lexbuf }
+      | newline	  { Parser.LINE_TERM }
+      | ['A'-'Z' 'a'-'z'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*  { Parser.ID (lexeme lexbuf) } 
+      | _    		  { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
+      | eof   	  { Parser.EOF }
+and sts_comment =
+  parse [^'\n' '\r']*  { Parser.COMMENT (lexeme lexbuf) }
+and sts_string s =
+  parse [^ '"']  { sts_string (s + (lexeme lexbuf)) lexbuf }
+      | '"' '"'  { sts_string (s + "\"") lexbuf }
+      | '"'      { Parser.STRING s }
+      | "\n"  { failwith ("LexerError crlf before 2nd \" in string") }
+{
+
+}
