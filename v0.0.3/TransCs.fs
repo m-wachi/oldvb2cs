@@ -9,6 +9,23 @@ module TransCs
         let sIndent = String.replicate idt AN_INDENT
         tOut.Write (sIndent + s)
 
+    let convSym (sym: Ast.Symbol) = sym
+
+    let convVbPrimType (t: Ast.VbPrimType) =
+         match t with
+         | Ast.VbTyString -> "string"
+         | Ast.VbTyInt -> "int"
+
+    let convVbType (t: Ast.VbType) =
+        match t with
+            | Ast.VbTySimple pt -> convVbPrimType pt
+            | Ast.VbTyArray pt -> (convVbPrimType pt) + "[]" 
+
+    let convProcParamDec (prm: Ast.Field) =
+        let sType = convVbType prm.Vbty
+        let sParamName = convSym (prm.Name)
+        sType + " " + sParamName
+       
 
     let rec convStmt (tOut: Writer) (idt:int) (stmt: Ast.Statement) =
         match stmt with
@@ -38,20 +55,14 @@ module TransCs
             | _ -> tOut.WriteLine "(not implemented yet...)"
             
     and convProcDec (tOut: Writer) (idt:int) nm pms bdy p = 
-        //let
-        //    val procName = convSym (#name r)
-        //    val sParam = MwUtil.strJoin (", ", (map convProcParamDec (#params r)))
-        //    val procHdr = "static void " ^ procName ^ "(" ^ sParam ^ ")\n" 
         let procName = nm
-        let sParam = ""    //not implemented yet.
+        let sParam = String.Join(", ", (List.map convProcParamDec pms))
         let procHdr = "static void " + procName + "(" + sParam + ")\n" 
-        //in
-        //    outputWithIndent (os, idt, procHdr);
         outputWithIndent tOut idt procHdr
-        //    outputWithIndent (os, idt, "{\n");
+        outputWithIndent tOut idt "{\n"
         //    convLglines (os, idt+1, (#body r));
         //    (* TextIO.output (os, (sIdt ^ "}\n")); *)
-        //    outputWithIndent (os, idt, "}\n");
+        outputWithIndent tOut idt "}\n"
         //    ""
         //end
 
