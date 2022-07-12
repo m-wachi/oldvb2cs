@@ -26,19 +26,10 @@ module TransCs
         let sParamName = convSym (prm.Name)
         sType + " " + sParamName
        
-    //fun convVar (v: Absyn.var) =
-    //    case v of
-    //        Absyn.SimpleVar (sym, _) => convSym sym
     let convVar (v: Ast.Var) =
         match v with
             | Ast.SimpleVar (sym, _) -> convSym sym
             
-    //fun convExp (e: Absyn.exp) =
-    //    case e of
-    //        Absyn.VarExp v => convVar v
-    //        | Absyn.IntExp i => Int.toString i
-    //        | Absyn.StringExp (s, _) => "\"" ^ s ^ "\""
-    //        | Absyn.OpExp reco => convOpExp reco
     let convExp (e: Ast.Exp) =
         match e with
             | Ast.VarExp v -> convVar v
@@ -50,15 +41,6 @@ module TransCs
             // Absyn.LclVarDecl (v, t) => convLclVarDecl (os, idt, (v, t))
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
-            //| Absyn.AssignStmt (v, e) => 
-            //    let
-            //        (* val sIdt = MwUtil.repeatStr AN_INDENT idt *)
-            //        val s = (convVar v) ^ " = " ^ (convExp e) ^ ";"
-            //    in
-            //        (* TextIO.output (os, sIdt ^ s);  *)
-            //        outputWithIndent (os, idt, s);
-            //        ""
-            //    end
             | Ast.AssignStmt (v, e) -> 
                 let sStmt = (convVar v) + " = " + (convExp e) + ";"
                 outputWithIndent tOut idt sStmt
