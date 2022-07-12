@@ -26,13 +26,29 @@ module TransCs
         let sParamName = convSym (prm.Name)
         sType + " " + sParamName
        
+    //fun convVar (v: Absyn.var) =
+    //    case v of
+    //        Absyn.SimpleVar (sym, _) => convSym sym
+    let convVar (v: Ast.Var) =
+        match v with
+            | Ast.SimpleVar (sym, _) -> convSym sym
+            
+    //fun convExp (e: Absyn.exp) =
+    //    case e of
+    //        Absyn.VarExp v => convVar v
+    //        | Absyn.IntExp i => Int.toString i
+    //        | Absyn.StringExp (s, _) => "\"" ^ s ^ "\""
+    //        | Absyn.OpExp reco => convOpExp reco
+    let convExp (e: Ast.Exp) =
+        match e with
+            | Ast.VarExp v -> convVar v
+            | Ast.IntExp i -> i.ToString()
+            | Ast.StringExp s -> "\"" + s + "\""
 
     let rec convStmt (tOut: Writer) (idt:int) (stmt: Ast.Statement) =
         match stmt with
             // Absyn.LclVarDecl (v, t) => convLclVarDecl (os, idt, (v, t))
-            //| Absyn.ProcDec r => convProcDec (os, idt, r)
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
-            //| Absyn.BlankLine => (outputWithIndent (os, idt, "");"")
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             //| Absyn.AssignStmt (v, e) => 
             //    let
@@ -43,6 +59,9 @@ module TransCs
             //        outputWithIndent (os, idt, s);
             //        ""
             //    end
+            | Ast.AssignStmt (v, e) -> 
+                let sStmt = (convVar v) + " = " + (convExp e) + ";"
+                outputWithIndent tOut idt sStmt
             //| Absyn.CallProc (sym, params) =>
             //    let
             //        val procName = convProcName (convSym sym)
@@ -61,10 +80,8 @@ module TransCs
         outputWithIndent tOut idt procHdr
         outputWithIndent tOut idt "{\n"
         //    convLglines (os, idt+1, (#body r));
-        //    (* TextIO.output (os, (sIdt ^ "}\n")); *)
+        convLglines tOut (idt+1) bdy
         outputWithIndent tOut idt "}\n"
-        //    ""
-        //end
 
     and convLgline (tOut: Writer) (idt:int) ((stmt: Ast.Statement), (cmnt: Ast.Comment)) =
         let s = if "" <> cmnt then ("//" + cmnt) else ""
