@@ -38,7 +38,7 @@ module TransCs
 
     let rec convStmt (tOut: Writer) (idt:int) (stmt: Ast.Statement) =
         match stmt with
-            // Absyn.LclVarDecl (v, t) => convLclVarDecl (os, idt, (v, t))
+            | Ast.LclVarDecl (v, t) -> convLclVarDecl tOut idt v t
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             | Ast.AssignStmt (v, e) -> 
@@ -55,6 +55,10 @@ module TransCs
             //    end
             | _ -> tOut.WriteLine "(not implemented yet...)"
             
+    and convLclVarDecl (tOut: Writer) (idt:int) v t =
+        let sStmt = (convVbType t) + " " + (convVar v) + ";"
+        outputWithIndent tOut idt sStmt
+        
     and convProcDec (tOut: Writer) (idt:int) nm pms bdy p = 
         let procName = nm
         let sParam = String.Join(", ", (List.map convProcParamDec pms))
