@@ -3,14 +3,15 @@
 '
 Sub Main(argv() As String)
    
-    Dim ab As String
+    Dim ab0_1 As String
     Dim c() As String
+    Dim d As String
     
     ' assign statement
     ab0_1 = "Hello "
-    c = "World."
+    d = "World."
 
-    Msgbox ab01_1
+    Msgbox ab0_1
 
 End Sub
 
