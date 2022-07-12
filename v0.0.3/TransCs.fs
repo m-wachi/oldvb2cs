@@ -9,6 +9,11 @@ module TransCs
         let sIndent = String.replicate idt AN_INDENT
         tOut.Write (sIndent + s)
 
+    let convProcName (procName: string) : string =
+        match procName with
+            | "Msgbox" -> "Console.WriteLine"
+            | _ -> procName
+            
     let convSym (sym: Ast.Symbol) = sym
 
     let convVbPrimType (t: Ast.VbPrimType) =
@@ -36,6 +41,10 @@ module TransCs
             | Ast.IntExp i -> i.ToString()
             | Ast.StringExp s -> "\"" + s + "\""
 
+    let convProcParams (prms: Ast.Exp list) =
+          String.Join(", ", (List.map convExp prms))
+
+
     let rec convStmt (tOut: Writer) (idt:int) (stmt: Ast.Statement) =
         match stmt with
             | Ast.LclVarDecl (v, t) -> convLclVarDecl tOut idt v t
@@ -44,16 +53,11 @@ module TransCs
             | Ast.AssignStmt (v, e) -> 
                 let sStmt = (convVar v) + " = " + (convExp e) + ";"
                 outputWithIndent tOut idt sStmt
-            //| Absyn.CallProc (sym, params) =>
-            //    let
-            //        val procName = convProcName (convSym sym)
-            //        val sProcStmt = procName ^ "(" ^ (convProcParams params) ^ ");"
-            //    in
-            //         (* TextIO.output (os, sProcStmt); *)
-            //         outputWithIndent (os, idt, sProcStmt);
-            //         ""
-            //    end
-            | _ -> tOut.WriteLine "(not implemented yet...)"
+            | Ast.CallProc (sym, prms) ->
+                  let procName = convProcName (convSym sym)
+                  let sProcStmt = procName + "(" + (convProcParams prms) + ");"
+                  outputWithIndent tOut idt sProcStmt
+            //| _ -> tOut.WriteLine "(not implemented yet...)"
             
     and convLclVarDecl (tOut: Writer) (idt:int) v t =
         let sStmt = (convVbType t) + " " + (convVar v) + ";"
@@ -65,13 +69,11 @@ module TransCs
         let procHdr = "static void " + procName + "(" + sParam + ")\n" 
         outputWithIndent tOut idt procHdr
         outputWithIndent tOut idt "{\n"
-        //    convLglines (os, idt+1, (#body r));
         convLglines tOut (idt+1) bdy
         outputWithIndent tOut idt "}\n"
 
     and convLgline (tOut: Writer) (idt:int) ((stmt: Ast.Statement), (cmnt: Ast.Comment)) =
         let s = if "" <> cmnt then ("//" + cmnt) else ""
-        //convStmt (os, idt, stmt);
         convStmt tOut idt stmt
         tOut.Write (s + "\n")
         
