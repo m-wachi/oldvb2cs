@@ -23,6 +23,7 @@ rule sts_initial =
       | ","            { Parser.COMMA }
       | '('            { Parser.LPAREN }
       | ')'            { Parser.RPAREN }
+      | '&'            { Parser.AMP }
       | "\""           { sts_string "" lexbuf }
       | "Sub"          { Parser.SUB }
       | "End"          { Parser.END }

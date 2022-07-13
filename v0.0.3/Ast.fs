@@ -15,11 +15,14 @@ module Ast
 
     type Field = {Name: Symbol; Vbty: VbType; Pos: pos}
 
+    type Oper = EqOp | NeqOp | AmpOp
+
     type Exp = 
         | VarExp of Var 
         | IntExp of int
         | StringExp of string
-
+        | OpExp of left: Exp * oper: Oper * right: Exp * pos: pos
+        
     type Statement = 
         | AssignStmt of Var * Exp
         | BlankLine
@@ -51,13 +54,38 @@ module Ast
     let fieldToStr (fld: Field) =
         fld.Name + ":" + (vbtypeToStr fld.Vbty)
    
+    //fun operToStr (ope: oper) =
+    //    case ope of
+    //        EqOp => "EqOp"
+    //        | NeqOp => "NeqOp"
+    //        | AmpOp => "AmpOp"
+    let operToStr (ope: Oper) =
+        match ope with
+            | EqOp -> "EqOp"
+            | NeqOp -> "NeqOp"
+            | AmpOp -> "AmpOp"
 
-    let exprToStr expr =
+    let rec exprToStr expr =
         match expr with
         | IntExp n -> "IntExp: " + n.ToString()
         | StringExp s -> "StringExp: \"" + s + "\""
         | VarExp (SimpleVar (sym, pos)) -> "VarExp: SimpleVar: " + sym.ToString()
+        | OpExp (lft, oper, rgt, p) -> opExpToStr lft oper rgt p
 
+    and opExpToStr lft oper rgt p =
+        //let
+        //    val sLeft = expToStr (#left reco)
+        //    val sOper = operToStr (#oper reco)
+        //    val sRight = expToStr (#right reco)
+        //in
+        //    "OpExp left: " ^ sLeft ^ ", oper: " ^ sOper ^ ", right: " ^ sRight
+        //end
+        let sLeft = exprToStr lft
+        let sOper = operToStr oper
+        let sRight = exprToStr rgt
+        "OpExp left: " + sLeft + ", oper: " + sOper + ", right: " + sRight
+        
+        
     let rec statementToStr stmt =
         match stmt with
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"

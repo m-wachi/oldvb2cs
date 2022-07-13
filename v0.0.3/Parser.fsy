@@ -8,7 +8,7 @@
 // Regular tokens
 %token <System.Int32> INT
 %token <string> ID
-%token EQUAL LPAREN RPAREN COMMA
+%token EQUAL LPAREN RPAREN COMMA AMP
 %token SUB END DIM AS
 %token LINE_TERM
 %token TY_STRING TY_INT
@@ -84,6 +84,8 @@ exp:
     INT                        { Ast.IntExp $1 }
     | STRING                   { Ast.StringExp $1 }
     | ID                       { Ast.VarExp  (Ast.SimpleVar($1, 0)) }
+    | exp AMP exp              { Ast.OpExp (left=$1, oper=Ast.AmpOp, right=$3, pos=0) }
+    
 
 // Using F# keywords for nonterminal names is okay.
 end: EOF {}
