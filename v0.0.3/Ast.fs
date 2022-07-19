@@ -73,13 +73,6 @@ module Ast
         | OpExp (lft, oper, rgt, p) -> opExpToStr lft oper rgt p
 
     and opExpToStr lft oper rgt p =
-        //let
-        //    val sLeft = expToStr (#left reco)
-        //    val sOper = operToStr (#oper reco)
-        //    val sRight = expToStr (#right reco)
-        //in
-        //    "OpExp left: " ^ sLeft ^ ", oper: " ^ sOper ^ ", right: " ^ sRight
-        //end
         let sLeft = exprToStr lft
         let sOper = operToStr oper
         let sRight = exprToStr rgt
