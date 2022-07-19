@@ -34,13 +34,27 @@ module TransCs
     let convVar (v: Ast.Var) =
         match v with
             | Ast.SimpleVar (sym, _) -> convSym sym
-            
-    let convExp (e: Ast.Exp) =
+
+    let convOper (oper: Ast.Oper) =
+        match oper with
+            | Ast.EqOp -> "="
+            | Ast.NeqOp -> "!="
+            | Ast.AmpOp -> "+"
+
+    let rec convExp (e: Ast.Exp) =
         match e with
             | Ast.VarExp v -> convVar v
             | Ast.IntExp i -> i.ToString()
             | Ast.StringExp s -> "\"" + s + "\""
-
+            | Ast.OpExp (lft, oper, rgt, p) -> convOpExp lft oper rgt p
+            
+    and convOpExp lft (oper: Ast.Oper) rgt p = 
+        let sLeft = convExp lft
+        let sOper = convOper oper
+        let sRight = convExp rgt
+        sLeft + " " + sOper + " " + sRight
+            
+            
     let convProcParams (prms: Ast.Exp list) =
           String.Join(", ", (List.map convExp prms))
 
