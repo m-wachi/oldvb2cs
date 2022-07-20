@@ -22,6 +22,7 @@ module Ast
         | IntExp of int
         | StringExp of string
         | OpExp of left: Exp * oper: Oper * right: Exp * pos: pos
+        | CallFunc of Symbol * (Exp list)
         
     type Statement = 
         | AssignStmt of Var * Exp
@@ -67,6 +68,8 @@ module Ast
         | StringExp s -> "StringExp: \"" + s + "\""
         | VarExp (SimpleVar (sym, pos)) -> "VarExp: SimpleVar: " + sym.ToString()
         | OpExp (lft, oper, rgt, p) -> opExpToStr lft oper rgt p
+        | CallFunc (sym, prms) -> 
+            "CallFunc " + sym + "(" + (procParamsToStr prms) + ")"
 
     and opExpToStr lft oper rgt p =
         let sLeft = exprToStr lft
@@ -75,7 +78,7 @@ module Ast
         "OpExp left: " + sLeft + ", oper: " + sOper + ", right: " + sRight
         
         
-    let rec statementToStr stmt =
+    and statementToStr stmt =
         match stmt with
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"
         | BlankLine -> "BlankLine"
