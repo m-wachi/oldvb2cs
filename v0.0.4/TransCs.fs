@@ -40,6 +40,7 @@ module TransCs
             | Ast.EqOp -> "="
             | Ast.NeqOp -> "!="
             | Ast.AmpOp -> "+"
+            | Ast.PlusOp -> "+"
 
     let rec convExp (e: Ast.Exp) =
         match e with

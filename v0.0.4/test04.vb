@@ -24,7 +24,7 @@ Sub Subroutine01(p1 As Integer, p2 As Integer)
     Dim c As Integer
     Dim d As String
     
-'    c = p1 + p2
+    c = p1 + p2
 '    d = CStr(d)
     
     Msgbox d

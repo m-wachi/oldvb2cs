@@ -54,16 +54,12 @@ module Ast
     let fieldToStr (fld: Field) =
         fld.Name + ":" + (vbtypeToStr fld.Vbty)
    
-    //fun operToStr (ope: oper) =
-    //    case ope of
-    //        EqOp => "EqOp"
-    //        | NeqOp => "NeqOp"
-    //        | AmpOp => "AmpOp"
     let operToStr (ope: Oper) =
         match ope with
             | EqOp -> "EqOp"
             | NeqOp -> "NeqOp"
             | AmpOp -> "AmpOp"
+            | PlusOp -> "PlusOp"
 
     let rec exprToStr expr =
         match expr with
