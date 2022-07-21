@@ -71,9 +71,10 @@ module TransCs
                 | [] -> ()
                 | prm2::prm2s -> 
                     convExp tOut 0 prm2
-                    outputWithIndent tOut 0 ", "
+                    if prm2s.IsEmpty then ()
+                        else outputWithIndent tOut 0 ", "
                     subrtn prm2s
-                    ()
+
         subrtn prms
         //String.Join(", ", (List.map convExp prms))
 
