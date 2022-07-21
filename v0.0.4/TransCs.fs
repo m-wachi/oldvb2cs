@@ -42,22 +42,40 @@ module TransCs
             | Ast.AmpOp -> "+"
             | Ast.PlusOp -> "+"
 
-    let rec convExp (e: Ast.Exp) =
+    let rec convExp (tOut: Writer) (idt:int) (e: Ast.Exp) =
         match e with
-            | Ast.VarExp v -> convVar v
-            | Ast.IntExp i -> i.ToString()
-            | Ast.StringExp s -> "\"" + s + "\""
-            | Ast.OpExp (lft, oper, rgt, p) -> convOpExp lft oper rgt p
-            
-    and convOpExp lft (oper: Ast.Oper) rgt p = 
-        let sLeft = convExp lft
+            | Ast.VarExp v -> outputWithIndent tOut idt (convVar v)
+            | Ast.IntExp i -> outputWithIndent tOut idt (i.ToString())
+            | Ast.StringExp s -> outputWithIndent tOut idt ("\"" + s + "\"")
+            | Ast.OpExp (lft, oper, rgt, p) -> 
+                //outputWithIndent tOut idt (convOpExp lft oper rgt p)
+                convOpExp tOut idt lft oper rgt p
+            | Ast.CallFunc (sym, prms) -> 
+                let funcName = convProcName (convSym sym)
+                //let sCallFuncExp = funcName + "(" + (convProcParams prms) + ");"
+                outputWithIndent tOut idt (funcName + "(")
+                convProcParams tOut idt prms
+                outputWithIndent tOut idt ")"
+
+    and convOpExp (tOut: Writer) (idt:int) lft (oper: Ast.Oper) rgt p = 
+        let sLeft = convExp tOut idt lft
         let sOper = convOper oper
-        let sRight = convExp rgt
-        sLeft + " " + sOper + " " + sRight
+        let sRight = convExp tOut idt rgt
+        convExp tOut idt lft
+        outputWithIndent tOut idt (" " + sOper + " ")
+        convExp tOut idt rgt
             
-            
-    let convProcParams (prms: Ast.Exp list) =
-          String.Join(", ", (List.map convExp prms))
+    and convProcParams (tOut: Writer) (idt:int) (prms: Ast.Exp list) =
+        let rec subrtn (prms2: Ast.Exp list) =
+            match prms2 with
+                | [] -> ()
+                | prm2::prm2s -> 
+                    convExp tOut 0 prm2
+                    outputWithIndent tOut 0 ", "
+                    subrtn prm2s
+                    ()
+        subrtn prms
+        //String.Join(", ", (List.map convExp prms))
 
 
     let rec convStmt (tOut: Writer) (idt:int) (stmt: Ast.Statement) =
@@ -66,13 +84,17 @@ module TransCs
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             | Ast.AssignStmt (v, e) -> 
-                let sStmt = (convVar v) + " = " + (convExp e) + ";"
-                outputWithIndent tOut idt sStmt
+                //let sStmt = (convVar v) + " = " + (convExp e) + ";"
+                let sStmt1 = (convVar v) + " = "
+                outputWithIndent tOut idt sStmt1
+                convExp tOut 0 e
+                outputWithIndent tOut 0 ";"
             | Ast.CallProc (sym, prms) ->
-                  let procName = convProcName (convSym sym)
-                  let sProcStmt = procName + "(" + (convProcParams prms) + ");"
-                  outputWithIndent tOut idt sProcStmt
-            //| _ -> tOut.WriteLine "(not implemented yet...)"
+                let procName = convProcName (convSym sym)
+                //let sProcStmt = procName + "(" + (convProcParams prms) + ");"
+                outputWithIndent tOut idt (procName + "(")
+                convProcParams tOut idt prms
+                outputWithIndent tOut 0 ")"
             
     and convLclVarDecl (tOut: Writer) (idt:int) v t =
         let sStmt = (convVbType t) + " " + (convVar v) + ";"
