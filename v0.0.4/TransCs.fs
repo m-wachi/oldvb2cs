@@ -58,9 +58,9 @@ module TransCs
                 outputWithIndent tOut idt ")"
 
     and convOpExp (tOut: Writer) (idt:int) lft (oper: Ast.Oper) rgt p = 
-        let sLeft = convExp tOut idt lft
+        //let sLeft = convExp tOut idt lft
         let sOper = convOper oper
-        let sRight = convExp tOut idt rgt
+        //let sRight = convExp tOut idt rgt
         convExp tOut idt lft
         outputWithIndent tOut idt (" " + sOper + " ")
         convExp tOut idt rgt
@@ -95,7 +95,7 @@ module TransCs
                 //let sProcStmt = procName + "(" + (convProcParams prms) + ");"
                 outputWithIndent tOut idt (procName + "(")
                 convProcParams tOut idt prms
-                outputWithIndent tOut 0 ")"
+                outputWithIndent tOut 0 ");"
             
     and convLclVarDecl (tOut: Writer) (idt:int) v t =
         let sStmt = (convVbType t) + " " + (convVar v) + ";"
