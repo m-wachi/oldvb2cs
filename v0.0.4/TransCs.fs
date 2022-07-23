@@ -12,6 +12,7 @@ module TransCs
     let convProcName (procName: string) : string =
         match procName with
             | "Msgbox" -> "Console.WriteLine"
+            | "CStr" -> "VbLib01.CStr"
             | _ -> procName
             
     let convSym (sym: Ast.Symbol) = sym
