@@ -9,7 +9,7 @@
 %token <System.Int32> INT
 %token <string> ID
 %token EQUAL LPAREN RPAREN COMMA AMP PLUS
-%token SUB END DIM AS
+%token SUB FUNCTION END DIM AS
 %token LINE_TERM
 %token TY_STRING TY_INT
 %token <string> COMMENT
@@ -48,6 +48,8 @@ logical_line:
 subroutine_declaration:
     SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
         { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
+    | FUNCTION ID LPAREN procedure_parameters RPAREN AS vbprimtype LINE_TERM logical_lines END FUNCTION
+        { Ast.FuncDec (name=$2, prmtrs=$4, body=$9, pos=0) }
 
 procedure_parameters: 
     procedure_parameter   { [$1] }

@@ -84,6 +84,7 @@ module TransCs
         match stmt with
             | Ast.LclVarDecl (v, t) -> convLclVarDecl tOut idt v t
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
+            | Ast.FuncDec (nm, pms, bdy, p) -> convFuncDec tOut idt nm pms bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             | Ast.AssignStmt (v, e) -> 
                 //let sStmt = (convVar v) + " = " + (convExp e) + ";"
@@ -103,6 +104,15 @@ module TransCs
         outputWithIndent tOut idt sStmt
         
     and convProcDec (tOut: Writer) (idt:int) nm pms bdy p = 
+        let procName = nm
+        let sParam = String.Join(", ", (List.map convProcParamDec pms))
+        let procHdr = "static void " + procName + "(" + sParam + ")\n" 
+        outputWithIndent tOut idt procHdr
+        outputWithIndent tOut idt "{\n"
+        convLglines tOut (idt+1) bdy
+        outputWithIndent tOut idt "}\n"
+
+    and convFuncDec (tOut: Writer) (idt:int) nm pms bdy p = 
         let procName = nm
         let sParam = String.Join(", ", (List.map convProcParamDec pms))
         let procHdr = "static void " + procName + "(" + sParam + ")\n" 

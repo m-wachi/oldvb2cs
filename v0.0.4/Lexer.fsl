@@ -27,6 +27,7 @@ rule sts_initial =
       | '+'            { Parser.PLUS }
       | "\""           { sts_string "" lexbuf }
       | "Sub"          { Parser.SUB }
+      | "Function"     { Parser.FUNCTION }
       | "End"          { Parser.END }
       | "Dim"          { Parser.DIM }
       | "As"           { Parser.AS }
