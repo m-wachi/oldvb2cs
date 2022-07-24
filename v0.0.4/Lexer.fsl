@@ -34,7 +34,7 @@ rule sts_initial =
       | "String"           { Parser.TY_STRING }
       | "Integer"           { Parser.TY_INT }
       | whitespace	  { sts_initial lexbuf }
-      | newline	  { Parser.LINE_TERM }
+      | newline	  { newline lexbuf; Parser.LINE_TERM }
       | ['A'-'Z' 'a'-'z'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*  { Parser.ID (lexeme lexbuf) } 
       | _    		  { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
       | eof   	  { Parser.EOF }
