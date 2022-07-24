@@ -1,0 +1,100 @@
+%{
+
+%}
+
+// The start token becomes a parser function in the compiled code:
+%start prog
+
+// Regular tokens
+%token <System.Int32> INT
+%token <string> ID
+%token EQUAL LPAREN RPAREN COMMA AMP PLUS
+%token SUB FUNCTION END DIM AS
+%token LINE_TERM
+%token TY_STRING TY_INT
+%token <string> COMMENT
+%token <string> STRING
+
+// Misc tokens
+%token EOF
+
+// This is the type of the data produced by a successful reduction of the 'start'
+// symbol:
+%type < Ast.Prog > prog
+%type < (Ast.Statement * Ast.Comment) > logical_line
+%type < Ast.Statement > statement
+
+%%
+
+// These are the rules of the grammar along with the F# code of the 
+// actions executed as rules are reduced.  
+prog: 
+    logical_lines end { Ast.Prog $1 }
+    | end      { Ast.Prog [] }
+    
+
+logical_lines:
+    logical_line                       { [ $1] }
+    | logical_line logical_lines       { $1 :: $2 }
+
+
+logical_line: 
+    statement LINE_TERM                  { ($1, "") }
+    | statement COMMENT LINE_TERM        { ($1, $2) }
+    | COMMENT LINE_TERM                  { (Ast.BlankLine, $1) }
+    | LINE_TERM                          { (Ast.BlankLine, "") }
+    | subroutine_declaration LINE_TERM   { ($1, "") }
+
+subroutine_declaration:
+    SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
+        { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
+    | FUNCTION ID LPAREN procedure_parameters RPAREN AS vbprimtype LINE_TERM logical_lines END FUNCTION
+        { Ast.FuncDec (name=$2, prmtrs=$4, body=$9, pos=0) }
+
+procedure_parameters: 
+    procedure_parameter   { [$1] }
+    | procedure_parameter COMMA procedure_parameters { $1 :: $3 }
+    | {[]}
+	
+procedure_parameter: 
+    ID AS vbprimtype { {Name=$1; Vbty=(Ast.VbTySimple $3); Pos=0} }
+    | ID LPAREN RPAREN AS vbprimtype 
+       { {Name=$1; Vbty=(Ast.VbTyArray $5); Pos=0} }
+
+
+statement:
+    ID EQUAL exp               { Ast.AssignStmt (Ast.SimpleVar($1, 0), $3) }
+    | local_var_decl           { $1 }
+    | ID proc_params           { Ast.CallProc ($1, $2) }
+
+proc_params:
+    exp                    {[$1]}
+    |exp COMMA proc_params { $1 :: $3 }
+    | {[]}
+
+proc_param:
+      exp             { $1}
+
+local_var_decl:
+    DIM ID AS vbprimtype    { Ast.LclVarDecl (Ast.SimpleVar($2, 0), Ast.VbTySimple $4) }
+    | DIM ID LPAREN RPAREN AS vbprimtype { Ast.LclVarDecl (Ast.SimpleVar($2, 0), (Ast.VbTyArray $6)) }
+    
+vbtype:
+    TY_STRING  { Ast.VbTySimple Ast.VbTyString }
+    | TY_INT   { Ast.VbTySimple Ast.VbTyInt }
+
+vbprimtype:
+    TY_STRING { Ast.VbTyString }
+    | TY_INT  { Ast.VbTyInt }
+
+exp: 
+    INT                        { Ast.IntExp $1 }
+    | STRING                   { Ast.StringExp $1 }
+    | ID                       { Ast.VarExp  (Ast.SimpleVar($1, 0)) }
+    | exp AMP exp              { Ast.OpExp (left=$1, oper=Ast.AmpOp, right=$3, pos=0) }
+    | exp PLUS exp             { Ast.OpExp (left=$1, oper=Ast.PlusOp, right=$3, pos=0) }
+    | ID LPAREN proc_params RPAREN { Ast.CallFunc ($1, $3) }
+    
+
+// Using F# keywords for nonterminal names is okay.
+end: EOF {}
