@@ -1,9 +1,16 @@
 module TransCs
 
     open System
+    open System.Collections.Generic
+
 
     type Writer = IO.TextWriter
 
+    type SymRec = { Symbol: Ast.Symbol; ScopeName: string; }
+
+    let symDict = Dictionary<string, SymRec>()
+    let scopeStack = Stack<string>()
+    
     let outputWithIndent (tOut: Writer) (idt:int) (s: string) =
         let AN_INDENT = "    "
         let sIndent = String.replicate idt AN_INDENT
@@ -116,6 +123,8 @@ module TransCs
         let procName = nm
         let sParam = String.Join(", ", (List.map convProcParamDec pms))
         let procHdr = "static void " + procName + "(" + sParam + ")\n" 
+        scopeStack.Push(procName)
+        symDict.Add(procName, {Symbol=procName; ScopeName=procName})
         outputWithIndent tOut idt procHdr
         outputWithIndent tOut idt "{\n"
         convLglines tOut (idt+1) bdy
@@ -145,6 +154,7 @@ module TransCs
         convAll tOut parseResult
 
     let translate02 (parseResult: Ast.Prog) (fileName: string) =
+        symDict.Clear()
         let tOut = new IO.StreamWriter(fileName)
         convAll tOut parseResult
         tOut.Close()
