@@ -22,7 +22,12 @@ module TransCs
             | "CStr" -> "VbLib01.CStr"
             | _ -> procName
             
-    let convSym (sym: Ast.Symbol) = sym
+    let convSym (sym: Ast.Symbol) = 
+        let funcName = 
+            if scopeStack.Count > 0 
+                then scopeStack.Peek()
+                else ""
+        if funcName = sym then "__" + sym + "__" else sym
 
     let convVbPrimType (t: Ast.VbPrimType) =
          match t with
@@ -94,7 +99,6 @@ module TransCs
             | Ast.FuncDec (nm, pms, bdy, p) -> convFuncDec tOut idt nm pms bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             | Ast.AssignStmt (v, e) -> 
-                //let sStmt = (convVar v) + " = " + (convExp e) + ";"
                 let sStmt1 = (convVar v) + " = "
                 outputWithIndent tOut idt sStmt1
                 convExp tOut 0 e
@@ -127,7 +131,11 @@ module TransCs
         symDict.Add(procName, {Symbol=procName; ScopeName=procName})
         outputWithIndent tOut idt procHdr
         outputWithIndent tOut idt "{\n"
+        //TODO!!
+        outputWithIndent tOut (idt+1) ("int __" + procName + "__;\n")
         convLglines tOut (idt+1) bdy
+        outputWithIndent tOut (idt+1) ("return __" + procName + "__;\n")
+        scopeStack.Pop() |> ignore
         outputWithIndent tOut idt "}\n"
 
     and convLgline (tOut: Writer) (idt:int) ((stmt: Ast.Statement), (cmnt: Ast.Comment)) =
