@@ -49,7 +49,7 @@ subroutine_declaration:
     SUB ID LPAREN procedure_parameters RPAREN LINE_TERM logical_lines END SUB
         { Ast.ProcDec (name=$2, prmtrs=$4, body=$7, pos=0) }
     | FUNCTION ID LPAREN procedure_parameters RPAREN AS vbprimtype LINE_TERM logical_lines END FUNCTION
-        { Ast.FuncDec (name=$2, prmtrs=$4, body=$9, pos=0) }
+        { Ast.FuncDec (name=$2, prmtrs=$4, rettype=$7, body=$9, pos=0) }
 
 procedure_parameters: 
     procedure_parameter   { [$1] }

@@ -32,7 +32,7 @@ module Ast
         | LclVarDecl of Var * VbType
         | CallProc of Symbol * (Exp list)
         | FuncDec of 
-            name: Symbol * prmtrs: Field list * body: LgLine list * pos: pos
+            name: Symbol * prmtrs: Field list * rettype: VbPrimType * body: LgLine list * pos: pos
                     
     and LgLine = (Statement * Comment)
 
@@ -85,7 +85,7 @@ module Ast
         | AssignStmt (v, e) -> "AssignStmt: (" + (varToStr v) + ", " + (exprToStr e) + ")"
         | BlankLine -> "BlankLine"
         | ProcDec (nm, pms, bdy, p) -> (procDecToStr nm pms bdy p)
-        | FuncDec (nm, pms, bdy, p) -> (funcDecToStr nm pms bdy p)
+        | FuncDec (nm, pms, retty, bdy, p) -> (funcDecToStr nm pms retty bdy p)
         | LclVarDecl (v, t) -> "LclVarDecl var=" + (varToStr v)
         | CallProc (sym, prms) ->
             "CallProc " + sym + "(" + (procParamsToStr prms) + ")"
@@ -97,10 +97,11 @@ module Ast
         let body = logicalLinesToStr bdy
         procHdr + body + "End ProcDec " + procName
 
-    and funcDecToStr nm pms bdy p =
+    and funcDecToStr nm pms retty bdy p =
         let procName = nm
         let sParam = String.Join(", ", (List.map fieldToStr pms))
-        let procHdr = "ProcDec " + procName + "(" + sParam + ")\n" 
+        let sRetType = vbprimtypeToStr retty
+        let procHdr = "FuncDec " + procName + "(" + sParam + ") retType=" + sRetType + "\n" 
         let body = logicalLinesToStr bdy
         procHdr + body + "End FuncDec " + procName
 

@@ -96,7 +96,7 @@ module TransCs
         match stmt with
             | Ast.LclVarDecl (v, t) -> convLclVarDecl tOut idt v t
             | Ast.ProcDec (nm, pms, bdy, p) -> convProcDec tOut idt nm pms bdy p
-            | Ast.FuncDec (nm, pms, bdy, p) -> convFuncDec tOut idt nm pms bdy p
+            | Ast.FuncDec (nm, pms, retty, bdy, p) -> convFuncDec tOut idt nm pms retty bdy p
             | Ast.BlankLine -> outputWithIndent tOut idt ""
             | Ast.AssignStmt (v, e) -> 
                 let sStmt1 = (convVar v) + " = "
@@ -123,10 +123,11 @@ module TransCs
         convLglines tOut (idt+1) bdy
         outputWithIndent tOut idt "}\n"
 
-    and convFuncDec (tOut: Writer) (idt:int) nm pms bdy p = 
+    and convFuncDec (tOut: Writer) (idt:int) nm pms rty bdy p = 
         let procName = nm
         let sParam = String.Join(", ", (List.map convProcParamDec pms))
-        let procHdr = "static void " + procName + "(" + sParam + ")\n" 
+        let sRetType = convVbPrimType rty
+        let procHdr = "static " + sRetType + " " + procName + "(" + sParam + ")\n" 
         scopeStack.Push(procName)
         symDict.Add(procName, {Symbol=procName; ScopeName=procName})
         outputWithIndent tOut idt procHdr
