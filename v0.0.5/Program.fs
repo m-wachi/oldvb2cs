@@ -7,9 +7,13 @@ open FSharp.Text.Lexing
 let parseFile (fileName: string) =
     use textReader = new System.IO.StreamReader(fileName)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
-
-    Parser.prog Lexer.sts_initial lexbuf
-    
+    try
+        Parser.prog Lexer.sts_initial lexbuf
+    with
+        | ex -> 
+            printfn "ERROR!!:\n"
+            printfn "%A" (ex.ToString())
+            raise ex
 
 [<EntryPoint>]
 let main argv =

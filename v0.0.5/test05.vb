@@ -7,6 +7,7 @@ Sub Main(argv() As String)
     Dim c() As String
     Dim d As String
     Dim e As String
+    Dim n1 As Integer
     
     ' assign statement
     ab0_1 = "Hello "
@@ -17,6 +18,9 @@ Sub Main(argv() As String)
     Msgbox e
 
     Subroutine01 3, 5
+
+    n1 = Func01(2, 3)
+    Msgbox "n1 = " & CStr(n1)
 
 End Sub
 
