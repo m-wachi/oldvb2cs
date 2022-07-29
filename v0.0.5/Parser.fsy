@@ -1,5 +1,18 @@
 %{
 
+(*
+let parse_error a =
+    printfn "parse_error called."
+*)
+
+//This works. but I don't know why...
+let parse_error_rich =
+    let f (a : FSharp.Text.Parsing.ParseErrorContext<_>) = 
+        printfn "parse_error_rich"
+        printfn "%A" a.CurrentToken
+        ()
+    Some f
+
 %}
 
 // The start token becomes a parser function in the compiled code:
