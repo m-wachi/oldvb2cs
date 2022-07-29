@@ -7,9 +7,18 @@ let parse_error a =
 
 //This works. but I don't know why...
 let parse_error_rich =
-    let f (a : FSharp.Text.Parsing.ParseErrorContext<_>) = 
+    let f (ectx : FSharp.Text.Parsing.ParseErrorContext<_>) = 
+        let tok = ectx.CurrentToken
         printfn "parse_error_rich"
-        printfn "%A" a.CurrentToken
+        printfn "%A" tok
+        //let sToken = token_to_string tok
+        //printfn "sToken=%A" sToken
+        (*
+        match tok with
+        | Parser.AS (pos, line) -> 
+            printfn "Token \"AS\" line %A, pos %A" line pos
+        | _ -> printfn "%A" tok
+        *)
         ()
     Some f
 
@@ -22,7 +31,8 @@ let parse_error_rich =
 %token <System.Int32> INT
 %token <string> ID
 %token EQUAL LPAREN RPAREN COMMA AMP PLUS
-%token SUB FUNCTION END DIM AS
+%token SUB FUNCTION END DIM
+%token <int * int> AS
 %token LINE_TERM
 %token TY_STRING TY_INT
 %token <string> COMMENT

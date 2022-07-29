@@ -7,7 +7,8 @@ open FSharp.Text.Lexing
 let lexeme = LexBuffer<_>.LexemeString
 
 let newline (lexbuf: LexBuffer<_>) = 
-  lexbuf.StartPos <- lexbuf.StartPos.NextLine
+  // printfn "position=%A" lexbuf.StartPos
+  lexbuf.EndPos <- lexbuf.EndPos.NextLine
 
 }
 
@@ -30,7 +31,7 @@ rule sts_initial =
       | "Function"     { Parser.FUNCTION }
       | "End"          { Parser.END }
       | "Dim"          { Parser.DIM }
-      | "As"           { Parser.AS }
+      | "As"           { Parser.AS (lexbuf.StartPos.Column, lexbuf.StartPos.Line)}
       | "String"           { Parser.TY_STRING }
       | "Integer"           { Parser.TY_INT }
       | whitespace	  { sts_initial lexbuf }
